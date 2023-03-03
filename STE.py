@@ -2,14 +2,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pydub import AudioSegment
 
+import os
+print(os.getcwd())
 
 # Define STE function
+
+
 def STE(frame):
     return sum([x**2 for x in frame]) / len(frame)
 
 
 # Load audio file
-audio = AudioSegment.from_file("D:\code\Python\KHDL\Atest.mp3")
+audio = AudioSegment.from_file("Atest.mp3")
 
 # Define frame parameters
 frame_size = 2048  # Replace with your desired frame size in samples
