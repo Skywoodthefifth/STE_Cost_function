@@ -66,31 +66,49 @@ ste = ste / np.max(ste)
 # Hàm cost_function
 
 
-def cost_function(true_labels, predicted_labels):
-    # Tìm số khung bị phân loại sai
-    num_misclassified_frames = np.sum(true_labels != predicted_labels)
+# def cost_function(true_labels, predicted_labels):
+#     # Tìm số khung bị phân loại sai
+#     num_misclassified_frames = np.sum(true_labels != predicted_labels)
 
-    # Trả về số khung bị phân loại sai
+#     # Trả về số khung bị phân loại sai
+#     return num_misclassified_frames
+
+
+# threshold = [0.1 + i * 0.1 for i in range(10)]
+# for i in threshold:
+#     is_voiced = np.zeros(num_frames_uv + num_frames_v)
+#     for j in range(num_frames_uv + num_frames_v):
+#         is_voiced[j] = 1 if ste[j] > i else 0
+#     # plt.figure()
+#     # plt.plot(is_voiced)
+#     print(i)
+#     print(cost_function(labeled, is_voiced))
+
+def cost_function(threshold):
+    is_voiced = np.zeros(num_frames_uv + num_frames_v)
+    for j in range(num_frames_uv + num_frames_v):
+        is_voiced[j] = 1 if ste[j] > threshold else 0
+    num_misclassified_frames = np.sum(labeled != is_voiced)
     return num_misclassified_frames
 
 
-threshold = [0.1 + i * 0.1 for i in range(10)]
-for i in threshold:
-    is_voiced = np.zeros(num_frames_uv + num_frames_v)
-    for j in range(num_frames_uv + num_frames_v):
-        is_voiced[j] = 1 if ste[j] > i else 0
-    # plt.figure()
-    # plt.plot(is_voiced)
-    print(i)
-    print(cost_function(labeled, is_voiced))
+# Define the range of threshold values to search over
+threshold_values = np.linspace(0, 1, num=1000)
+
+# Find the threshold value that minimizes the cost function
+min_threshold = np.argmin([cost_function(T) for T in threshold_values])
+
+# Print the optimal threshold value and the corresponding cost
+print("Optimal threshold value:", threshold_values[min_threshold])
+print("Minimum cost:", cost_function(threshold_values[min_threshold]))
 
 
 # Thử nghiệm với ngưỡng 0.1 xem phân loại đúng không
 
 # Create time axis
 # sample_rate = unvoice.frame
-time_axis = np.arange(len(is_voiced)) * hop_size / \
-    (num_frames_uv + num_frames_v)
+# time_axis = np.arange(len(is_voiced)) * hop_size / \
+#     (num_frames_uv + num_frames_v)
 
 # # Create a figure with two subplots
 # fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(10, 5))
@@ -109,9 +127,9 @@ time_axis = np.arange(len(is_voiced)) * hop_size / \
 # ax2.set_ylabel("Short-Time Energy")
 # ax2.set_title("Short-Time Energy of Audio File")
 
-plt.plot(time_axis, ste)
-plt.xlabel("Time (s)")
-plt.ylabel("Short-Time Energy")
-plt.title("Short-Time Energy of Audio File")
+# plt.plot(time_axis, ste)
+# plt.xlabel("Time (s)")
+# plt.ylabel("Short-Time Energy")
+# plt.title("Short-Time Energy of Audio File")
 
-plt.show()
+# plt.show()
