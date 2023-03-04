@@ -133,3 +133,44 @@ print("Minimum cost:", cost_function(threshold_values[min_threshold]))
 # plt.title("Short-Time Energy of Audio File")
 
 # plt.show()
+
+
+audio = AudioSegment.from_file(
+    "studio_F2.wav")
+
+# Split audio into frames
+samples = np.array(audio.get_array_of_samples())
+num_frames = int(np.ceil(len(samples) / hop_size))
+frames = np.zeros((num_frames, frame_size))
+for i in range(num_frames):
+    frame_start = i * hop_size
+    frame_end = frame_start + frame_size
+    frame = samples[frame_start:frame_end]
+    frames[i, :len(frame)] = frame
+
+energy = np.zeros(num_frames)
+for i in range(num_frames):
+    energy[i] = STE(frames[i, :])
+energy = energy / np.max(energy)
+
+is_voiced = np.zeros(num_frames)
+for j in range(num_frames):
+    is_voiced[j] = 1 if energy[j] > threshold_values[min_threshold] else 0
+
+sample_rate = audio.frame_rate
+time_axis = np.arange(len(energy)) * hop_size / sample_rate
+
+plt.plot(time_axis, energy)
+plt.xlabel("Time (s)")
+plt.ylabel("Short-Time Energy")
+plt.title("Short-Time Energy of Audio File")
+
+plt.figure()
+plt.stem(time_axis, is_voiced, use_line_collection=True)
+plt.xlabel("Time (s)")
+plt.ylabel("Voiced/Unvoiced")
+plt.title("Classification of Audio Frames")
+
+plt.figure()
+plt.plot(samples)
+plt.show()
