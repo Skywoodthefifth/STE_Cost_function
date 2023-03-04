@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from pydub import AudioSegment
+import seaborn as sns
 
 # Define STE function
 
@@ -84,11 +85,15 @@ ste = ste / np.max(ste)
 #     print(i)
 #     print(cost_function(labeled, is_voiced))
 
+
+miss_frames = [] 
+
 def cost_function(threshold):
     is_voiced = np.zeros(num_frames_uv + num_frames_v)
     for j in range(num_frames_uv + num_frames_v):
         is_voiced[j] = 1 if ste[j] > threshold else 0
     num_misclassified_frames = np.sum(labeled != is_voiced)
+    miss_frames.append(num_misclassified_frames)
     return num_misclassified_frames
 
 
@@ -135,8 +140,7 @@ print("Minimum cost:", cost_function(threshold_values[min_threshold]))
 # plt.show()
 
 
-audio = AudioSegment.from_file(
-    "studio_F2.wav")
+audio = AudioSegment.from_file("studio_F2.wav")
 
 # Split audio into frames
 samples = np.array(audio.get_array_of_samples())
@@ -160,7 +164,8 @@ for j in range(num_frames):
 sample_rate = audio.frame_rate
 time_axis = np.arange(len(energy)) * hop_size / sample_rate
 
-plt.plot(time_axis, energy)
+#plot figure
+plt.plot(energy)
 plt.xlabel("Time (s)")
 plt.ylabel("Short-Time Energy")
 plt.title("Short-Time Energy of Audio File")
@@ -173,4 +178,14 @@ plt.title("Classification of Audio Frames")
 
 plt.figure()
 plt.plot(samples)
+
+plt.figure()
+freq_miss, threshold, patches = plt.hist(miss_frames, 100, color='blue', edgecolor='black')
+
+plt.figure()
+threshold_values = np.insert(threshold_values, 0, 0)
+plt.bar(miss_frames, threshold_values, width=10)
+
+
+
 plt.show()
